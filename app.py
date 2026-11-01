@@ -9,8 +9,8 @@ st.markdown("---")
 
 # 1. ஜெரோதா மற்றும் வாட்ஸ்அப் ஏபிஐ கான்பிகரேஷன்
 st.sidebar.header("🔑 Configuration Keys")
-api_key = st.sidebar.text_input("Enter Zerodha API Key", type="password")
-api_secret = st.sidebar.text_input("Enter Zerodha API Secret", type="password")
+api_key = st.sidebar.text_input("Enter Zerodha API Key", type="password", value="உங்களுடைய_உண்மையான_API_KEY")
+api_secret = st.sidebar.text_input("Enter Zerodha API Secret", type="password", value="உங்களுடைய_உண்மையான_API_SECRET")
 
 st.sidebar.markdown("---")
 st.sidebar.header("💬 WhatsApp Configuration")
