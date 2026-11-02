@@ -81,8 +81,10 @@ if st.button("🚀 Start Live Market Analysis", type="secondary"):
         strike_to_buy = f"NIFTY {atm_strike} CE"
         
         # ஜெரோதா ஒன்-டச் பாஸ்கெட் ஆர்டர் லிங்க் (Kite Publisher URL)
-        trade_data = f'[{"variety":"regular","tradingsymbol":"NIFTY26N05{atm_strike}CE","exchange":"NFO","transaction_type":"BUY","order_type":"MARKET","quantity":25,"product":"NRML"}]'
-        one_touch_url = f"https://zerodha.com{api_key}&data={trade_data}"
+              # எஃப்-ஸ்ட்ரிங் எரர் வராமல் தடுக்க ஒற்றை மேற்கோள் குறிகள் சரியாக மாற்றப்பட்டுள்ளன
+        trade_data = '[{"variety":"regular","tradingsymbol":"NIFTY26N05' + str(atm_strike) + 'CE","exchange":"NFO","transaction_type":"BUY","order_type":"MARKET","quantity":25,"product":"NRML"}]'
+        one_touch_url = "https://zerodha.com" + str(api_key) + "&data=" + str(trade_data)
+
         
         # 🔊 சிக்னல் உறுதியானதால் ஒலி அலர்ட்டை இயக்குகிறோம்
         play_sound()
