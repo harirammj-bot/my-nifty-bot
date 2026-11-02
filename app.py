@@ -5,6 +5,11 @@ import requests
 # பக்கத்தின் கட்டமைப்பு
 st.set_page_config(page_title="Hari Smart Nifty Bot with WhatsApp", layout="wide")
 st.title("📊 Hari Smart Nifty Option Bot (WhatsApp Alert)")
+# வாட்ஸ்அப் இணைக்காததால் தற்காலிகமாக காலியாக வைக்கப்பட்டுள்ளது
+id_instance = ""
+api_token = ""
+your_phone = ""
+
 st.markdown("---")
 # 1. ஜெரோதா ஏபிஐ கான்பிகரேஷன் (மெயின் ஸ்கிரீனில் நேரடியாகத் தோன்றும்)
 st.header("🔑 Zerodha API Connection")
