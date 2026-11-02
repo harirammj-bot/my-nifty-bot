@@ -30,10 +30,11 @@ col_api1, col_api2 = st.columns(2)
 
 with col_api1:
     # உங்களுடைய உண்மையான API KEY-ஐ கீழே உள்ள "" க்குள் நிரந்தரமாக பேஸ்ட் செய்து கொள்ளலாம்
-    api_key = st.text_input("Enter API Key", type="password", value="YOUR_ACTUAL_API_KEY")
+    api_key = st.text_input("Enter API Key", type="password", value="0p8jmlee4u8qm0ks
+")
 with col_api2:
     # உங்களுடைய உண்மையான API SECRET-ஐ கீழே உள்ள "" க்குள் நிரந்தரமாக பேஸ்ட் செய்து கொள்ளலாம்
-    api_secret = st.text_input("Enter API Secret", type="password", value="YOUR_ACTUAL_API_SECRET")
+    api_secret = st.text_input("Enter API Secret", type="password", value="sea7oylkcnctxp65d71wbkrlb2o0w7w4")
 
 # பட்டன் மெயின் ஸ்கிரீனில் நேரடியாக உள்ளது
 if st.button("🔌 CONNECT ZERODHA NOW", type="primary"):
