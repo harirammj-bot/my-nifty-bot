@@ -6,16 +6,18 @@ import requests
 st.set_page_config(page_title="Hari Smart Nifty Bot with WhatsApp", layout="wide")
 st.title("📊 Hari Smart Nifty Option Bot (WhatsApp Alert)")
 st.markdown("---")
+# 1. ஜெரோதா ஏபிஐ கான்பிகரேஷன் (மெயின் ஸ்கிரீனில் நேரடியாகத் தோன்றும்)
+st.header("🔑 Zerodha API Connection")
+api_key = st.text_input("Enter API Key", type="password", value="உங்களுடைய_API_KEY")
+api_secret = st.text_input("Enter API Secret", type="password", value="உங்களுடைய_API_SECRET")
 
-# 1. ஜெரோதா மற்றும் வாட்ஸ்அப் ஏபிஐ கான்பிகரேஷன்
-st.sidebar.header("🔑 Configuration Keys")
-api_key = st.sidebar.text_input("Enter Zerodha API Key", type="password", value="உங்களுடைய_உண்மையான_API_KEY")
-api_secret = st.sidebar.text_input("Enter Zerodha API Secret", type="password", value="உங்களுடைய_உண்மையான_API_SECRET")
+# பட்டனை சைட் பாரில் இருந்து மெயின் ஸ்கிரீனுக்கு மாற்றியுள்ளோம்
+if st.button("🔌 CONNECT ZERODHA NOW", type="primary"):
+    if api_key and api_secret:
+        st.success("🟢 Zerodha Connected Successfully!")
+    else:
+        st.error("❌ Please check your API credentials")
 
-st.sidebar.markdown("---")
-st.sidebar.header("💬 WhatsApp Configuration")
-id_instance = st.sidebar.text_input("Enter Green API ID Instance")
-api_token = st.sidebar.text_input("Enter Green API Token Instance", type="password")
 your_phone = st.sidebar.text_input("Enter Your WhatsApp Number (e.g., 919876543210)")
 
 # 2. வாட்ஸ்அப் மெசேஜ் அனுப்பும் எளிய பைதான் பங்க்ஷன்
