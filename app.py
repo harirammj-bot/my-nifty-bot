@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import requests
 
 # பக்கத்தின் தலைப்பு மற்றும் வடிவமைப்பு
 st.set_page_config(page_title="Hari Smart Nifty Bot", layout="wide")
@@ -8,14 +7,7 @@ st.set_page_config(page_title="Hari Smart Nifty Bot", layout="wide")
 st.title("📊 Hari Smart Nifty Option Buying Bot")
 st.markdown("---")
 
-# வாட்ஸ்அப் / டெலிகிராம் NameError வராமல் தடுக்க தற்காலிக மாறிகள்
-id_instance = ""
-api_token = ""
-your_phone = ""
-bot_token = ""
-chat_id = ""
-
-# 🔊 சிக்னல் வரும்போது ஆன்லைனில் இருந்து அலாரம் ஒலியை இயக்கும் பங்க்ஷன்
+# 🔊 சிக்னல் வரும்போது ஆன்லைனில் இருந்து அலாரத்தை இயக்கும் பங்க்ஷன்
 def play_sound():
     sound_url = "https://soundjay.com"
     sound_html = f"""
@@ -29,23 +21,27 @@ st.header("🔑 Zerodha API Connection")
 col_api1, col_api2 = st.columns(2)
 
 with col_api1:
-    # உங்களுடைய உண்மையான API KEY-ஐ கீழே உள்ள "" க்குள் நிரந்தரமாக பேஸ்ட் செய்து கொள்ளலாம்
-    api_key = st.text_input("Enter API Key", type="password", value="0p8jmlee4u8qm0ks
-")
+    api_key = st.text_input("Enter API Key", type="password", value=st.session_state.get('saved_api_key', ''))
 with col_api2:
-    # உங்களுடைய உண்மையான API SECRET-ஐ கீழே உள்ள "" க்குள் நிரந்தரமாக பேஸ்ட் செய்து கொள்ளலாம்
-    api_secret = st.text_input("Enter API Secret", type="password", value="sea7oylkcnctxp65d71wbkrlb2o0w7w4")
+    api_secret = st.text_input("Enter API Secret", type="password", value=st.session_state.get('saved_api_secret', ''))
 
 # பட்டன் மெயின் ஸ்கிரீனில் நேரடியாக உள்ளது
 if st.button("🔌 CONNECT ZERODHA NOW", type="primary"):
-    if api_key and api_key != "YOUR_ACTUAL_API_KEY" and api_secret and api_secret != "YOUR_ACTUAL_API_SECRET":
+    if api_key and api_secret:
+        st.session_state['saved_api_key'] = api_key
+        st.session_state['saved_api_secret'] = api_secret
+        st.session_state['connected'] = True
         st.success("🟢 Zerodha Connected Successfully!")
     else:
-        st.error("❌ Please check your API credentials / Update your actual keys in code")
+        st.error("❌ Please enter your actual keys in the boxes above")
+
+# இணைப்பை உறுதி செய்தல்
+if st.session_state.get('connected', False):
+    st.info("🔄 Autoload Active: Your API keys are saved for this session.")
 
 st.markdown("---")
 
-# 2. டிரேடிங் உத்திகள் மற்றும் கட்டுப்பாடுகள் (Low Frequency - High Accuracy Rules)
+# 2. டிரேடிங் உத்திகள் மற்றும் கட்டுப்பாடுகள்
 st.header("🎯 Strategy Settings")
 col1, col2 = st.columns(2)
 with col1:
@@ -94,19 +90,19 @@ if st.button("🚀 Start Live Market Analysis", type="secondary"):
         st.success(f"🟢 ACTION SUGGESTION: BUY {strike_to_buy}")
         st.balloons()
         
-        # காரணங்களை தெளிவாகக் காட்டுதல்
+        # कारणोंங்களை தெளிவாகக் காட்டுதல்
         st.markdown(f"""
         **📢 ஒலி அலர்ட் இயக்கப்பட்டது! (Sound Alert Played)**
         
         **📝 அனாலிசிஸ் காரணம் (Reasoning):**
-        * 🎯 **துல்லியமான ஸ்ட்ரைக்:** Nifty ஸ்பாட் விலை {nifty_spot}-ல் இருப்பதால், பிர全面 வேகமாக உயர **{strike_to_buy}** (ATM) தேர்வு செய்யப்பட்டுள்ளது.
-        * 📈 **India VIX:** வாலட்டிலிட்டி {live_vix} ஆப்ชั่น பையிங்கிற்கு சாதகமாக உயர்ந்துள்ளதால் வேகமான மொமெண்டம் கிடைக்கும்.
+        * 🎯 **துல்லியமான ஸ்ட்ரைக்:** Nifty ஸ்பாட் விலை {nifty_spot}-ல் இருப்பதால், பிரீமியம் வேகமாக உயர **{strike_to_buy}** (ATM) தேர்வு செய்யப்பட்டுள்ளது.
+        * 📈 **India VIX:** வாலட்டிலிட்டி {live_vix} ஆப்ஷன் பையிங்கிற்கு சாதகமாக உயர்ந்துள்ளதால் வேகமான மொமெண்டம் கிடைக்கும்.
         * 📊 **Open Interest (OI):** PCR {nifty_pcr} ஆக உள்ளதால் வலுவான புட் ரைட்டிங் சப்போர்ட் உள்ளது.
-        * 🛑 **டிரேடிங் பிளான்:** உங்கள் இலக்கு **+{profit_target} பாயிண்டுகள்**, நஷ்ட வரம்பு **-{stop_loss} பாயிண்டுகள்**.
+        * 🛑 **டிரேடிங் பிளான்:** உங்கள் இலக்கு **+{profit_target} பாயிண்டுகள்**, நஷ்ட வரம்பு **-{stop_loss} பாயิண்டுகள்**.
         """)
         
         st.markdown("---")
-        # 🚀 பாப்-அப் பிளாக்கரைத் தவிர்க்க அதே விண்டோவில் ஜெரோதாவைத் திறக்கும் நவீன ஒன்-டச் பட்டன் டிசைன்
+        # 🚀 பாப்-அப் பிளாக்கரைத் தவிர்க்க அதே விண்டோவில் ஜெரோதாவைத் திறக்கும் பட்டன்
         button_html = f"""
         <a href="{one_touch_url}" target="_self">
             <button style="background-color:#FF4B4B; color:white; border:none; padding:15px 30px; border-radius:8px; font-size:18px; font-weight:bold; cursor:pointer; width:100%;">
@@ -118,4 +114,4 @@ if st.button("🚀 Start Live Market Analysis", type="secondary"):
         
     else:
         st.warning("⚠️ STATUS: WAIT / NO TRADING ZONE")
-        st.write("காரணம்: VIX அல்லது Open Interest ஆப்ชั่น பையிங்கிற்கு இன்னும் சாதகமாக அமையவில்லை. பிரீமியம் கரைய வாய்ப்புள்ளது. பொறுமையாக இருக்கவும்.")
+        st.write("காரணம்: VIX அல்லது Open Interest ஆப்ஷன் பையிங்கிற்கு இன்னும் சாதகமாக அமையவில்லை. பிரீமியம் கரைய வாய்ப்புள்ளது. பொறுமையாக இருக்கவும்.")
