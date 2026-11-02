@@ -21,9 +21,9 @@ st.header("🔑 Zerodha API Connection")
 col_api1, col_api2 = st.columns(2)
 
 with col_api1:
-    api_key = st.text_input("Enter API Key", type="password", value=st.session_state.get('saved_api_key', ''))
-with col_api2:
-    api_secret = st.text_input("Enter API Secret", type="password", value=st.session_state.get('saved_api_secret', ''))
+   api_key = st.text_input("Enter API Key", type="password", value="0p8jmlee4u8qm0ks")
+api_secret = st.text_input("Enter API Secret", type="password", value="yyfj06ipmy0o2tnyqayxlgmyjxmutctt")
+
 
 # பட்டன் மெயின் ஸ்கிரீனில் நேரடியாக உள்ளது
 if st.button("🔌 CONNECT ZERODHA NOW", type="primary"):
