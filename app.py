@@ -4,10 +4,11 @@ import numpy as np
 import requests
 import datetime
 import time
+import streamlit.components.v1 as components
 
 # பக்க வடிவமைப்பு மற்றும் தலைப்பு
 st.set_page_config(page_title="Nifty Options Live Bot", layout="wide")
-st.title("🎯 Nifty 50 Live Options Algo Bot & Permanent Chart")
+st.title("🎯 Nifty 50 Live Options Algo Bot & Fixed Chart")
 
 # ------------------------------------
 # 1. API மற்றும் டெலிகிராம் அமைப்புகள்
@@ -22,7 +23,7 @@ if 'notified_signals' not in st.session_state:
     st.session_state.notified_signals = set()
 
 # ------------------------------------
-# 2. சவுண்ட் மற்றும் டெலிகிராம் அலர்ட் ஃபங்க்ஷன்கள்
+# 2. அலர்ட் மற்றும் ஆடியோ சவுண்ட் ஃபங்க்ஷன்கள்
 # ------------------------------------
 def send_telegram_alert(message):
     if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
@@ -39,7 +40,7 @@ def play_sound_in_browser():
       <source src="https://mixkit.co" type="audio/wav">
     </audio>
     """
-    st.components.v1.html(sound_html, height=0)
+    components.html(sound_html, height=0)
 
 # ------------------------------------
 # 3. நேரடி மார்க்கெட் டேட்டா ஆய்வு 
@@ -81,32 +82,23 @@ def generate_options_signals(nifty, vix, oi, rsi):
     return signals
 
 # ------------------------------------
-# 4. எப்போதுமே மறையாத அட்வான்ஸ்டு சார்ட் விட்ஜெட் (Live & Non-Live / All Time Support)
+# 4. எப்போதுமே காட்டும் நிரந்தர சார்ட் (Secure Iframe Method)
 # ------------------------------------
-st.subheader("📈 Nifty 50 Live Technical Chart (Advanced Tool)")
+st.subheader("📈 Nifty 50 Live Technical Chart (Time Adjustable)")
 
-# மார்க்கெட் விடுமுறை மற்றும் இரவு நேரங்களிலும் வேலை செய்யக்கூடிய நிலையான பிரேம் எம்பெட்டிங்
-tradingview_advanced_html = """
-<div style="height:550px; width:100%;">
-  <iframe src="https://tradingview.com" 
-          width="100%" 
-          height="550" 
-          style="border:none; border-radius: 8px;" 
-          allowfullscreen>
-  </iframe>
-</div>
-"""
-# சார்ட்டை முதன்மையாக ஏற்றி வைப்பது (இது ரெஃப்ரெஷ் ஆகாது)
-st.html(tradingview_advanced_html)
+# பாதுகாப்பான நேரடி எம்பெட்டிங் லிங்க் (Live / Non-Live / Past History அனைத்தும் காட்டும்)
+chart_url = "https://tradingview.com"
+
+# Streamlit-ன் பிரத்யேக ஐபிரேம் விட்ஜெட் (இது மறையாது, பிளாங்க் ஆகாது)
+components.iframe(chart_url, height=550, scrolling=False)
 
 st.markdown("---")
 
 # ------------------------------------
-# 5. டேட்டா மற்றும் சிக்னல் அப்டேட் செய்யும் பகுதி (Fragment Block)
+# 5. ஆட்டோ அப்டேட் பகுதி (பாட்டின் ரன்னிங் லாஜிக்)
 # ------------------------------------
-# @st.fragment உபயோகிப்பதால் இந்த பகுதி மட்டுமே மாறும், மேலே உள்ள சார்ட் மாறாமல் அப்படியே இருக்கும்.
 @st.fragment(run_every=5)
-def refresh_live_dashboard():
+def run_options_bot():
     nifty, vix, oi, rsi = fetch_live_market_data()
 
     col1, col2, col3, col4 = st.columns(4)
@@ -140,5 +132,5 @@ def refresh_live_dashboard():
     else:
         st.info("மார்க்கெட் இண்டிகேட்டர்கள் தற்பொழுது நியூட்ரலாக உள்ளன. தகுந்த வாய்ப்பு வரும்போது தானாக அலர்ட் மற்றும் ஆடியோ ஒலிக்கும்.")
 
-# டேட்டா லூப்பை மட்டும் ரன் செய்தல்
-refresh_live_dashboard()
+# போட்டை இயக்குதல்
+run_options_bot()
