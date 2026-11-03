@@ -13,9 +13,8 @@ st.title("🎯 Nifty 50 Live Options Algo Bot & Fixed Chart")
 # ------------------------------------
 # 1. API மற்றும் டெலிகிராம் அமைப்புகள்
 # ------------------------------------
-KITE_API_KEY = "YOUR_ZERODHA_API_KEY"
-KITE_API_SECRET = "YOUR_ZERODHA_API_SECRET"
-
+KITE_API_KEY = "0p8jmlee4u8qm0ks"
+KITE_API_SECRET = "yyfj06ipmy0o2tnyqayxlgmyjxmutctt"
 TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  
 TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID"      
 
