@@ -5,7 +5,7 @@ import requests
 import datetime
 import time
 
-# பக்க வடிவமைப்பு மற்றும் தலைப்பு (சார்ட் நன்றாக தெரிய அகலமான பக்கம்)
+# பக்க வடிவமைப்பு மற்றும் தலைப்பு
 st.set_page_config(page_title="Nifty Options Live Bot", layout="wide")
 st.title("🎯 Nifty 50 Live Options Algo Bot & Live Chart")
 
@@ -42,7 +42,7 @@ def play_sound_in_browser():
     st.components.v1.html(sound_html, height=0)
 
 # ------------------------------------
-# 3. நேரடி மார்க்கெட் டேட்டா (Simulated)
+# 3. நேரடி மார்க்கெட் டேட்டா ஆய்வு 
 # ------------------------------------
 def fetch_live_market_data():
     current_nifty = 24200 + np.random.randint(-40, 40)
@@ -81,28 +81,19 @@ def generate_options_signals(nifty, vix, oi, rsi):
     return signals
 
 # ------------------------------------
-# 4. முதன்மை திரை வடிவமைப்பு (Main Dashboard)
+# 4. நிலையான லைவ் சார்ட் (மறையாமல் எப்போதும் காட்டும்)
 # ------------------------------------
-nifty, vix, oi, rsi = fetch_live_market_data()
-
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Nifty 50 Live", f"{nifty}")
-col2.metric("India VIX", f"{vix:.2f}")
-col3.metric("OI Trend", f"{oi}")
-col4.metric("RSI (14)", f"{rsi}")
-
-st.markdown("---")
-
-# 📊 5. வர்த்தகக் காட்சி - TradingView Live Nifty Chart இணைக்கப்படும் இடம்
 st.subheader("📈 Nifty 50 Live Technical Chart (TradingView)")
 
+# இந்த இடத்தில் சார்ட் ஆட்டோ-ரெஃப்ரெஷ் ஆகாமல் தடுக்க நிலையான விட்ஜெட் குறியீடு
 tradingview_html = """
-<div class="tradingview-widget-container" style="height:450px;width:100%;">
-  <div id="tradingview_nifty"></div>
+<div class="tradingview-widget-container" style="height:500px; width:100%;">
+  <div id="tradingview_nifty" style="height:100%; width:100%;"></div>
   <script type="text/javascript" src="https://tradingview.com"></script>
   <script type="text/javascript">
   new TradingView.widget({
-    "autosize": true,
+    "width": "100%",
+    "height": 500,
     "symbol": "NSE:NIFTY",
     "interval": "5",
     "timezone": "Asia/Kolkata",
@@ -118,35 +109,49 @@ tradingview_html = """
   </script>
 </div>
 """
-# சார்ட்டை ஸ்கிரீனில் காண்பித்தல்
-st.components.v1.html(tradingview_html, height=450)
+st.components.v1.html(tradingview_html, height=510)
 
 st.markdown("---")
-st.subheader("📢 நேரலை இன்ட்ராடே ஆப்ஷன்ஸ் சிக்னல்கள்")
 
-live_signals = generate_options_signals(nifty, vix, oi, rsi)
+# ------------------------------------
+# 5. ஆட்டோ-ரெஃப்ரெஷ் ஆகும் லைவ் டேட்டா பகுதி (Live Container)
+# ------------------------------------
+live_data_placeholder = st.empty()
 
-if live_signals:
-    for sig in live_signals:
-        if sig["Key"] not in st.session_state.notified_signals:
-            st.session_state.notified_signals.add(sig["Key"])
-            play_sound_in_browser()
-            
-            msg = f"⚠️ {sig['Type']} ALERT!\n🎯 {sig['Strike']}\n💰 Entry: {sig['Entry']}\n🚀 Target: {sig['Target']}\n🛑 SL: {sig['SL']}\n⏰ Time: {sig['Time']}\n⚡ Order Link: {sig['Link']}"
-            send_telegram_alert(msg)
-            
-        with st.container():
-            st.markdown(f"### {sig['Type']} - நேரம்: {sig['Time']}")
-            c1, c2, c3, c4 = st.columns(4)
-            c1.markdown(f"**ஸ்ட்ரைக்:** \n ### {sig['Strike']}")
-            c2.markdown(f"**என்ட்ரி விலை:** \n ### {sig['Entry']}")
-            c3.markdown(f"**டார்கெட் (+10):** \n ### {sig['Target']}")
-            c4.markdown(f"**ஸ்டாப் லாஸ் (-20):** \n ### {sig['SL']}")
-            st.markdown(f"[⚡ Zerodha Kite-ல் ஒரே டச்சில் ஆர்டர் செய்ய இங்கே கிளிக் செய்யவும்]({sig['Link']})")
-            st.markdown("---")
-else:
-    st.info("மார்க்கெட் இண்டிகேட்டர்கள் தற்பொழுது நியூட்ரலாக உள்ளன. தகுந்த வாய்ப்பு வரும்போது தானாக அலர்ட் மற்றும் ஆடியோ ஒலிக்கும்.")
+with live_data_placeholder.container():
+    nifty, vix, oi, rsi = fetch_live_market_data()
 
-# ஆட்டோ-ரெஃப்ரெஷ் (5 விநாடிகள்)
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Nifty 50 Live", f"{nifty}")
+    col2.metric("India VIX", f"{vix:.2f}")
+    col3.metric("OI Trend", f"{oi}")
+    col4.metric("RSI (14)", f"{rsi}")
+
+    st.subheader("📢 நேரலை இன்ட்ராடே ஆப்ஷன்ஸ் சிக்னல்கள்")
+
+    live_signals = generate_options_signals(nifty, vix, oi, rsi)
+
+    if live_signals:
+        for sig in live_signals:
+            if sig["Key"] not in st.session_state.notified_signals:
+                st.session_state.notified_signals.add(sig["Key"])
+                play_sound_in_browser()
+                
+                msg = f"⚠️ {sig['Type']} ALERT!\n🎯 {sig['Strike']}\n💰 Entry: {sig['Entry']}\n🚀 Target: {sig['Target']}\n🛑 SL: {sig['SL']}\n⏰ Time: {sig['Time']}\n⚡ Order Link: {sig['Link']}"
+                send_telegram_alert(msg)
+                
+            with st.container():
+                st.markdown(f"### {sig['Type']} - நேரம்: {sig['Time']}")
+                c1, c2, c3, c4 = st.columns(4)
+                c1.markdown(f"**ஸ்ட்ரைக்:** \n ### {sig['Strike']}")
+                c2.markdown(f"**என்ட்ரி விலை:** \n ### {sig['Entry']}")
+                c3.markdown(f"**டார்கெட் (+10):** \n ### {sig['Target']}")
+                c4.markdown(f"**ஸ்டாப் லாஸ் (-20):** \n ### {sig['SL']}")
+                st.markdown(f"[⚡ Zerodha Kite-ல் ஒரே டச்சில் ஆர்டர் செய்ய இங்கே கிளிக் செய்யவும்]({sig['Link']})")
+                st.markdown("---")
+    else:
+        st.info("மார்க்கெட் இண்டிகேட்டர்கள் தற்பொழுது நியூட்ரலாக உள்ளன. தகுந்த வாய்ப்பு வரும்போது தானாக அலர்ட் மற்றும் ஆடியோ ஒலிக்கும்.")
+
+# பாட் பின்னணியில் டேட்டாவை மட்டும் புதுப்பிக்க 5 விநாடிகள் காத்திருக்கவும்
 time.sleep(5)
 st.rerun()
