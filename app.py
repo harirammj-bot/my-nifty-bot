@@ -1,62 +1,88 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from kiteconnect import KiteConnect
-import os
 
-# 1. பக்க வடிவமைப்பு (Wide screen)
-st.set_page_config(layout="wide", page_title="Automated Trading Bot")
+# 1. பக்க வடிவமைப்பு 
+st.set_page_config(layout="wide", page_title="Nifty Live Options Algo Bot")
 
-# 2. உங்கள் Zerodha API விவரங்கள் (தானாகவே லோட் ஆகும்படி சேமிக்கப்பட்டுள்ளது)
+# 2. உங்கள் Zerodha API விவரங்கள்
 API_KEY = "0p8jmlee4u8qm0ks"
 API_SECRET = "yyfj06ipmy0o2tnyqayxlgmyjxmutctt"
 
-# டோக்கனைத் தற்காலிகமாகச் சேமிக்க ஒரு கோப்பு (File)
-TOKEN_FILE = "access_token.txt"
+# KiteConnect கிளையன்ட்
+try:
+    kite = KiteConnect(api_key=API_KEY)
+except Exception as e:
+    st.error(f"Kite Connect தொடங்குவதில் பிழை: {e}")
 
-@st.cache_resource
-def get_kite_client():
-    return KiteConnect(api_key=API_KEY)
+st.title("📊 Nifty 50 வர்த்தக கட்டுப்பாட்டுப் பலகை")
 
-kite = get_kite_client()
+# இரு பிரிவுகளாகப் பிரித்தல் (Layout Columns)
+col1, col2 = st.columns([1, 1])
 
-# செஷன் (Session) மேலாண்மை
-if os.path.exists(TOKEN_FILE):
-    with open(TOKEN_FILE, "r") as f:
-        saved_token = f.read().strip()
-    if saved_token:
-        kite.set_access_token(saved_token)
-        st.sidebar.success("Zerodha கணக்கு தானாகவே இணைக்கப்பட்டது! (Access Token Loaded)")
+with col1:
+    st.subheader("🔐 Zerodha லாகின் மேலாண்மை")
+    
+    # மொபைல் பிரவுசரில் சிக்கல் தராத எளிய லாகின் பட்டன் லிங்க்
+    login_url = f"https://zerodha.com{API_KEY}&v=3"
+    st.markdown(f'''
+        <a href="{login_url}" target="_blank">
+            <button style="
+                background-color: #e33e33; 
+                color: white; 
+                padding: 12px 24px; 
+                border: none; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                font-size: 16px;
+                font-weight: bold;
+                width: 100%;">
+                🎯 Zerodha-வுடன் இணைக்க இங்கே கிளிக் செய்யவும்
+            </button>
+        </a>
+    ''', unsafe_allowed_html=True)
+    
+    st.write("")
+    # லாகின் செய்த பின் கிடைக்கும் Request Token-ஐ மேனுவலாக உள்ளிட எளிய பாக்ஸ்
+    req_token = st.text_input("லாகின் செய்த பின் கிடைக்கும் Request Token-ஐ இங்கே பேஸ்ட் செய்யவும்:")
+    
+    if st.button("Access Token உருவாக்கு", use_container_width=True):
+        if req_token:
+            try:
+                data = kite.generate_session(req_token, api_secret=API_SECRET)
+                st.success("வாழ்த்துகள்! Zerodha வெற்றிகரமாக இணைக்கப்பட்டுவிட்டது.")
+                st.json({"status": "Connected", "user_id": data.get("user_id")})
+            except Exception as e:
+                st.error(f"இணைப்பதில் பிழை: {e}. தயவுசெய்து புதிய டோக்கனைப் பயன்படுத்தவும்.")
+        else:
+            st.warning("தயவுசெய்து Request Token-ஐ உள்ளிடவும்.")
 
-# ஒருவேளை பழைய டோக்கன் வேலை செய்யவில்லை என்றால் மட்டும் Sidebar-ல் லாகின் செய்யலாம்
-st.sidebar.title("Zerodha Auto Login")
-login_url = kite.login_url()
-st.sidebar.markdown(f"[இங்கே கிளிக் செய்து Zerodha லாகின் செய்யவும்]({login_url})")
+with col2:
+    st.subheader("📈 TradingView விளக்கப்படம் (Chart)")
+    st.warning("பிரவுசர் கட்டுப்பாடுகளால் மொபைலில் சார்ட் லோட் ஆகவில்லை என்றால், கீழே உள்ள லிங்க்கைப் பயன்படுத்தி புதிய டேபில் (New Tab) நேரடி வரைபடத்தைப் பார்க்கலாம்.")
+    
+    # மாற்று வழி: மொபைல் பிரவுசர்களில் பிளாக் ஆகாத அதிகாரப்பூர்வ மாற்று லிங்க்
+    direct_chart_url = "https://tradingview.com"
+    st.markdown(f'''
+        <a href="{direct_chart_url}" target="_blank">
+            <button style="
+                background-color: #2962ff; 
+                color: white; 
+                padding: 12px 24px; 
+                border: none; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                font-size: 16px;
+                font-weight: bold;
+                width: 100%;">
+                🖥️ Nifty 50 நேரடி வரைபடத்தைத் திறக்கவும்
+            </button>
+        </a>
+    ''', unsafe_allowed_html=True)
 
-# URL-ல் இருந்து Request Token ஐத் தானாகவே எடுக்கும் முறை
-query_params = st.query_params
-if "request_token" in query_params:
-    req_token = query_params["request_token"]
+    st.write("")
+    # உள்ளமைக்கப்பட்ட மாற்று Iframe (பாதுகாப்பான சாண்ட்பாக்ஸ் உடன்)
     try:
-        data = kite.generate_session(req_token, api_secret=API_SECRET)
-        access_token = data["access_token"]
-        kite.set_access_token(access_token)
-        # நிரந்தரமாகச் சேமித்தல்
-        with open(TOKEN_FILE, "w") as f:
-            f.write(access_token)
-        st.sidebar.success("புதிய Session உருவாக்கப்பட்டுச் சேமிக்கப்பட்டது!")
-        st.rerun()
-    except Exception as e:
-        st.sidebar.error(f"Login செய்வதில் பிழை: {e}")
-
-# 3. TradingView Chart (வெற்றுப் பக்கமாகத் தெரிவதைத் தடுக்கும் புதிய Iframe முறை)
-st.title("📊 Nifty 50 நேரடி விளக்கப்படம் (Live Chart)")
-
-# உறுதியாக வேலை செய்யக்கூடிய எளிய Iframe Chart
-chart_url = "https://tradingview.com"
-
-# Streamlit-ல் Chart-ஐக் காண்பித்தல்
-components.iframe(chart_url, height=650, scrolling=False)
-
-# 4. Trading Bot சிக்னல்கள் (Signals Place)
-st.subheader("🤖 வர்த்தக சிக்னல்கள் மற்றும் விழிப்பூட்டல்கள் (Trading Signals)")
-st.info("இங்கு உங்களின் 20-point Target மற்றும் 10-point Stoploss உத்திகளின் சிக்னல்கள் தோன்றும்.")
+        embed_url = "https://tradingview.com"
+        st.components.v1.iframe(embed_url, height=450, scrolling=False)
+    except:
+        st.info("உங்களது மொபைல் பிரவுசர் iframe-ஐத் தடுக்கிறது.")
