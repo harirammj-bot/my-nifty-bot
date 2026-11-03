@@ -7,7 +7,7 @@ import time
 
 # பக்க வடிவமைப்பு மற்றும் தலைப்பு
 st.set_page_config(page_title="Nifty Options Live Bot", layout="wide")
-st.title("🎯 Nifty 50 Live Options Algo Bot & Live Chart")
+st.title("🎯 Nifty 50 Live Options Algo Bot & Permanent Chart")
 
 # ------------------------------------
 # 1. API மற்றும் டெலிகிராம் அமைப்புகள்
@@ -58,8 +58,8 @@ def generate_options_signals(nifty, vix, oi, rsi):
     
     if oi == "BULLISH" or (rsi > 58 and vix < 16):
         entry_price = 125.00  
-        target_price = entry_price + 10.00  # 10 பாயிண்ட் ப்ராஃபிட் டார்கெட்
-        sl_price = entry_price - 20.00      # 20 பாயிண்ட் லாஸ் லிமிட்
+        target_price = entry_price + 10.00  
+        sl_price = entry_price - 20.00      
         
         symbol = f"NIFTY26N05{atm_strike}CE"
         kite_link = f"https://zerodha.com{KITE_API_KEY}&data=[%7B%22variety%22:%22regular%22,%22tradingsymbol%22:%22{symbol}%22,%22exchange%22:%22NFO%22,%22transaction_type%22:%22BUY%22,%22order_type%22:%22LIMIT%22,%22price%22:{entry_price},%22quantity%22:25,%22product%22:%22NRML%22%7D]"
@@ -81,44 +81,32 @@ def generate_options_signals(nifty, vix, oi, rsi):
     return signals
 
 # ------------------------------------
-# 4. நிலையான லைவ் சார்ட் (மறையாமல் எப்போதும் காட்டும்)
+# 4. எப்போதுமே மறையாத அட்வான்ஸ்டு சார்ட் விட்ஜெட் (Live & Non-Live / All Time Support)
 # ------------------------------------
-st.subheader("📈 Nifty 50 Live Technical Chart (TradingView)")
+st.subheader("📈 Nifty 50 Live Technical Chart (Advanced Tool)")
 
-# இந்த இடத்தில் சார்ட் ஆட்டோ-ரெஃப்ரெஷ் ஆகாமல் தடுக்க நிலையான விட்ஜெட் குறியீடு
-tradingview_html = """
-<div class="tradingview-widget-container" style="height:500px; width:100%;">
-  <div id="tradingview_nifty" style="height:100%; width:100%;"></div>
-  <script type="text/javascript" src="https://tradingview.com"></script>
-  <script type="text/javascript">
-  new TradingView.widget({
-    "width": "100%",
-    "height": 500,
-    "symbol": "NSE:NIFTY",
-    "interval": "5",
-    "timezone": "Asia/Kolkata",
-    "theme": "dark",
-    "style": "1",
-    "locale": "en",
-    "toolbar_bg": "#f1f3f6",
-    "enable_publishing": false,
-    "hide_side_toolbar": false,
-    "allow_symbol_change": true,
-    "container_id": "tradingview_nifty"
-  });
-  </script>
+# மார்க்கெட் விடுமுறை மற்றும் இரவு நேரங்களிலும் வேலை செய்யக்கூடிய நிலையான பிரேம் எம்பெட்டிங்
+tradingview_advanced_html = """
+<div style="height:550px; width:100%;">
+  <iframe src="https://tradingview.com" 
+          width="100%" 
+          height="550" 
+          style="border:none; border-radius: 8px;" 
+          allowfullscreen>
+  </iframe>
 </div>
 """
-st.components.v1.html(tradingview_html, height=510)
+# சார்ட்டை முதன்மையாக ஏற்றி வைப்பது (இது ரெஃப்ரெஷ் ஆகாது)
+st.html(tradingview_advanced_html)
 
 st.markdown("---")
 
 # ------------------------------------
-# 5. ஆட்டோ-ரெஃப்ரெஷ் ஆகும் லைவ் டேட்டா பகுதி (Live Container)
+# 5. டேட்டா மற்றும் சிக்னல் அப்டேட் செய்யும் பகுதி (Fragment Block)
 # ------------------------------------
-live_data_placeholder = st.empty()
-
-with live_data_placeholder.container():
+# @st.fragment உபயோகிப்பதால் இந்த பகுதி மட்டுமே மாறும், மேலே உள்ள சார்ட் மாறாமல் அப்படியே இருக்கும்.
+@st.fragment(run_every=5)
+def refresh_live_dashboard():
     nifty, vix, oi, rsi = fetch_live_market_data()
 
     col1, col2, col3, col4 = st.columns(4)
@@ -152,6 +140,5 @@ with live_data_placeholder.container():
     else:
         st.info("மார்க்கெட் இண்டிகேட்டர்கள் தற்பொழுது நியூட்ரலாக உள்ளன. தகுந்த வாய்ப்பு வரும்போது தானாக அலர்ட் மற்றும் ஆடியோ ஒலிக்கும்.")
 
-# பாட் பின்னணியில் டேட்டாவை மட்டும் புதுப்பிக்க 5 விநாடிகள் காத்திருக்கவும்
-time.sleep(5)
-st.rerun()
+# டேட்டா லூப்பை மட்டும் ரன் செய்தல்
+refresh_live_dashboard()
