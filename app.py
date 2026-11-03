@@ -8,7 +8,7 @@ st.set_page_config(layout="wide", page_title="Nifty Live Options Algo Bot")
 API_KEY = "0p8jmlee4u8qm0ks"
 API_SECRET = "yyfj06ipmy0o2tnyqayxlgmyjxmutctt"
 
-# KiteConnect கிளையன்ட்
+# KiteConnect கிளையன்ட் தொடங்குதல்
 try:
     kite = KiteConnect(api_key=API_KEY)
 except Exception as e:
@@ -22,27 +22,13 @@ col1, col2 = st.columns([1, 1])
 with col1:
     st.subheader("🔐 Zerodha லாகின் மேலாண்மை")
     
-    # மொபைல் பிரவுசரில் சிக்கல் தராத எளிய லாகின் பட்டன் லிங்க்
+    # பிழை தராத எளிய அசல் Streamlit லாகின் பட்டன் லிங்க்
     login_url = f"https://zerodha.com{API_KEY}&v=3"
-    st.markdown(f'''
-        <a href="{login_url}" target="_blank">
-            <button style="
-                background-color: #e33e33; 
-                color: white; 
-                padding: 12px 24px; 
-                border: none; 
-                border-radius: 4px; 
-                cursor: pointer; 
-                font-size: 16px;
-                font-weight: bold;
-                width: 100%;">
-                🎯 Zerodha-வுடன் இணைக்க இங்கே கிளிக் செய்யவும்
-            </button>
-        </a>
-    ''', unsafe_allowed_html=True)
+    
+    st.link_button("🎯 Zerodha-வுடன் இணைக்க இங்கே கிளிக் செய்யவும்", login_url, use_container_width=True)
     
     st.write("")
-    # லாகின் செய்த பின் கிடைக்கும் Request Token-ஐ மேனுவலாக உள்ளிட எளிய பாக்ஸ்
+    # லாகின் செய்த பின் கிடைக்கும் Request Token-ஐ உள்ளிட பாக்ஸ்
     req_token = st.text_input("லாகின் செய்த பின் கிடைக்கும் Request Token-ஐ இங்கே பேஸ்ட் செய்யவும்:")
     
     if st.button("Access Token உருவாக்கு", use_container_width=True):
@@ -58,31 +44,11 @@ with col1:
 
 with col2:
     st.subheader("📈 TradingView விளக்கப்படம் (Chart)")
-    st.warning("பிரவுசர் கட்டுப்பாடுகளால் மொபைலில் சார்ட் லோட் ஆகவில்லை என்றால், கீழே உள்ள லிங்க்கைப் பயன்படுத்தி புதிய டேபில் (New Tab) நேரடி வரைபடத்தைப் பார்க்கலாம்.")
     
-    # மாற்று வழி: மொபைல் பிரவுசர்களில் பிளாக் ஆகாத அதிகாரப்பூர்வ மாற்று லிங்க்
+    # மொபைலில் பிளாக் ஆகாத அசல் லிங்க் பட்டன்
     direct_chart_url = "https://tradingview.com"
-    st.markdown(f'''
-        <a href="{direct_chart_url}" target="_blank">
-            <button style="
-                background-color: #2962ff; 
-                color: white; 
-                padding: 12px 24px; 
-                border: none; 
-                border-radius: 4px; 
-                cursor: pointer; 
-                font-size: 16px;
-                font-weight: bold;
-                width: 100%;">
-                🖥️ Nifty 50 நேரடி வரைபடத்தைத் திறக்கவும்
-            </button>
-        </a>
-    ''', unsafe_allowed_html=True)
+    
+    st.link_button("🖥️ Nifty 50 நேரடி வரைபடத்தைத் திறக்கவும்", direct_chart_url, use_container_width=True)
 
     st.write("")
-    # உள்ளமைக்கப்பட்ட மாற்று Iframe (பாதுகாப்பான சாண்ட்பாக்ஸ் உடன்)
-    try:
-        embed_url = "https://tradingview.com"
-        st.components.v1.iframe(embed_url, height=450, scrolling=False)
-    except:
-        st.info("உங்களது மொபைல் பிரவுசர் iframe-ஐத் தடுக்கிறது.")
+    st.info("குறிப்பு: மேலே உள்ள பட்டனை அழுத்தினால் மொபைலில் TradingView சார்ட் தனியாகப் பிழையின்றித் திறக்கும்.")
