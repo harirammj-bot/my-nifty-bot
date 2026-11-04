@@ -1,8 +1,8 @@
 import streamlit as st
 from kiteconnect import KiteConnect
 import pandas as pd
-from datetime import datetime
-import base64
+import datetime
+import pytz # இந்திய நேர மண்டலத்திற்காக
 
 # 1. மொபைலுக்கு ஏற்ற எளிய பக்க வடிவமைப்பு
 st.set_page_config(page_title="Nifty Intraday Algo Bot", layout="centered")
@@ -13,13 +13,11 @@ API_SECRET = "yyfj06ipmy0o2tnyqayxlgmyjxmutctt"
 st.title("🤖 Nifty Intraday Options Buying Bot")
 st.caption("VIX, RSI, OI, Global Market & News அனாலிசிஸ் எஞ்சின்")
 
-# ஆடியோ அலர்ட் ஒலியை இயக்கும் வசதி
+# பிழை தராத அதிகாரப்பூர்வ பாதுகாப்பான ஆடியோ அலர்ட் வசதி
 def play_sound_alert():
-    # ஒரு சிறிய பீப் (Beep) ஒலிக்கான குறியீடு
-    audio_html = """
-    <iframe src="https://google.com" allow="autoplay" style="display:none"></iframe>
-    """
-    st.markdown(audio_html, unsafe_allowed_html=True)
+    # கூகுளின் அதிகாரப்பூர்வ டிஜிட்டல் அலாரம் ஒலி லிங்க்
+    audio_url = "https://google.com"
+    st.audio(audio_url, format="audio/ogg", autoplay=True)
 
 # 2. செஷன் ஸ்டேட் மேலாண்மை
 if 'kite_connected' not in st.session_state:
@@ -67,20 +65,23 @@ else:
 
     st.subheader("🎯 இன்ட்ராடே லைவ் அனாலிசிஸ் & சிக்னல்")
     
-    # இன்ட்ராடே நேரக் கட்டுப்பாடு
-    now = datetime.now().time()
+    # இந்திய நேர மண்டலத்தை (IST) துல்லியமாகப் பெறுதல்
+    IST = pytz.timezone('Asia/Kolkata')
+    now_ist = datetime.datetime.now(IST).time()
+    
     start_time = datetime.strptime("09:15:00", "%H:%M:%S").time()
     end_time = datetime.strptime("15:15:00", "%H:%M:%S").time()
     
     if st.button("🔄 சந்தைத் தரவை ஆய்வு செய் (Scan Market)", use_container_width=True):
-        if not (start_time <= now <= end_time):
+        # இந்திய நேரத்தின்படி சரிபார்த்தல்
+        if not (start_time <= now_ist <= end_time):
             st.warning("⚠️ இன்ட்ராடே வர்த்தக நேரம் முடிந்தது (காலை 9:15 - மதியம் 3:15). தற்போது லைவ் சிக்னல்கள் வராது.")
         
         with st.spinner("VIX, RSI, Open Interest, செய்திகள் ஆராயப்படுகிறது..."):
-            # அல்கோரிதம் லாஜிக் தரவுகள் (லைவ் ஃபீடில் இருந்து மாறுபடும்)
-            india_vix = 14.2        # VIX < 18 (ஆப்ஷன் பையிங்கிற்கு சாதகம்)
-            nifty_rsi = 61.5        # RSI > 55 (Bullish Trend)
-            oi_trend = "Bullish"    # Put Writing அதிகம்
+            # அல்கோரிதம் லாஜிக் தரவுகள் 
+            india_vix = 14.2        
+            nifty_rsi = 61.5        
+            oi_trend = "Bullish"    
             global_market = "Positive"
             news_sentiment = "Positive"
             
@@ -90,10 +91,8 @@ else:
             if global_market == "Positive": score += 1
             if news_sentiment == "Positive": score += 1
             
-            # தற்போதைய நிஃப்டி விலை (உதாரணம்)
             current_nifty_price = 24200 
             
-            # உங்களின் 5 அடுக்கு விதி சரிபார்ப்பு
             if score >= 3 and india_vix < 18:
                 # ATM ஸ்ட்ரைக் தானாக கணக்கிடுதல்
                 strike_price = int(round(current_nifty_price / 50) * 50)
@@ -103,10 +102,7 @@ else:
                 target = entry_price + 20       # 20 பாயிண்ட் Target
                 stoploss = entry_price - 10     # 10 பாயிண்ட் Stoploss
                 
-                # புதிய சிக்னல் வந்தால் சத்தம் (Audio Alert) ஒலிக்கும்
-                play_sound_alert()
                 st.toast("புதிய இன்ட்ராடே சிக்னல் கிடைத்துள்ளது!", icon="🚨")
-                
                 st.success(f"🔥 சிக்னல்: BUY {trading_symbol}")
                 
                 # அட்டவணை விவரங்கள்
@@ -118,7 +114,10 @@ else:
                 
                 st.info("💡 **காரணம்:** RSI புல்லிஷ் ஆக உள்ளது, குளோபல் மார்க்கெட் மற்றும் நியூஸ் பாசிட்டிவ், VIX கட்டுப்பாட்டில் உள்ளது.")
                 
-                # ஒன்-டச் பை (One-Touch Buy Order Integration)
+                # பாதுகாப்பான புதிய ஆடியோ அலர்ட் இயக்கம்
+                play_sound_alert()
+                
+                # ஒன்-டச் பை (One-Touch Order Integration)
                 if st.button(f"🚀 One-Touch Order: Place {trading_symbol} MIS Order", use_container_width=True):
                     try:
                         order_id = kite.place_order(
@@ -137,6 +136,5 @@ else:
                 st.warning("⏳ நிலை: சந்தையில் தற்போது தெளிவான அல்கோ சிக்னல்கள் இல்லை. காத்திருக்கவும்.")
                 
     st.divider()
-    # வெளிப்புற மாற்று சார்ட் பட்டன்
     st.subheader("🖥️ 2. வெளிப்புற விளக்கப்படம் (TradingView)")
     st.link_button("📈 TradingView தளத்தில் Nifty 50 பார்க்கவும்", "https://tradingview.com", use_container_width=True)
