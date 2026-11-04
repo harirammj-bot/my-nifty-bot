@@ -1,7 +1,7 @@
 import streamlit as st
 from kiteconnect import KiteConnect
 import pandas as pd
-import datetime
+from datetime import datetime # பிழையைச் சரிசெய்யும் நேரடி இம்போர்ட்
 import pytz # இந்திய நேர மண்டலத்திற்காக
 
 # 1. மொபைலுக்கு ஏற்ற எளிய பக்க வடிவமைப்பு
@@ -15,7 +15,6 @@ st.caption("VIX, RSI, OI, Global Market & News அனாலிசிஸ் எ�
 
 # பிழை தராத அதிகாரப்பூர்வ பாதுகாப்பான ஆடியோ அலர்ட் வசதி
 def play_sound_alert():
-    # கூகுளின் அதிகாரப்பூர்வ டிஜிட்டல் அலாரம் ஒலி லிங்க்
     audio_url = "https://google.com"
     st.audio(audio_url, format="audio/ogg", autoplay=True)
 
@@ -38,6 +37,7 @@ if not st.session_state['kite_connected']:
         if st.button("அல்கோவை இணைக்கவும்", use_container_width=True):
             if full_url and "request_token=" in full_url:
                 try:
+                    # URL-ல் இருந்து டோக்கனை துல்லியமாக பிரித்தெடுக்கும் முறை
                     req_token = full_url.split("request_token=")[1].split("&")[0]
                     data = kite.generate_session(req_token, api_secret=API_SECRET)
                     kite.set_access_token(data["access_token"])
@@ -67,7 +67,7 @@ else:
     
     # இந்திய நேர மண்டலத்தை (IST) துல்லியமாகப் பெறுதல்
     IST = pytz.timezone('Asia/Kolkata')
-    now_ist = datetime.datetime.now(IST).time()
+    now_ist = datetime.now(IST).time()
     
     start_time = datetime.strptime("09:15:00", "%H:%M:%S").time()
     end_time = datetime.strptime("15:15:00", "%H:%M:%S").time()
